@@ -9,12 +9,10 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var dbDefault *gorm.DB
-
-func (a *App) initDB() *gorm.DB {
+func InitDB() (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s",
-		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort,
+		"host=%s port=%s user=%s password=%s dbname=%s",
+		"localhost", "5432", "nxbac", "123456", "gin",
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -22,14 +20,8 @@ func (a *App) initDB() *gorm.DB {
 	})
 	if err != nil {
 		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		return nil, err
 	}
 
-	return db
-}
-
-func (a *App) GetDB() *gorm.DB {
-	if dbDefault == nil {
-		dbDefault = a.initDB()
-	}
-	return dbDefault
+	return db, nil
 }

@@ -1,19 +1,22 @@
 package repo
+
 import (
-  "go-gin/model"
-  "gorm.io/gorm"
+	"go-gin/model"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Repo struct {
-  db *gorm.DB
+	db *gorm.DB
 }
 
 func NewRepo(db *gorm.DB) *Repo {
-  return &Repo{
-    db: db,
-  }
+	return &Repo{
+		db: db,
+	}
 }
 
 type IRepo interface {
-  GetUsers(name string) ([]model.User, error)
+	GetItems(*gin.Context) ([]model.Item, error)
 }
