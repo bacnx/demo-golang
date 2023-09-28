@@ -1,19 +1,26 @@
 package handler
 
 import (
+	"context"
 	"go-gin/model"
-	"go-gin/service"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Item struct {
-	service service.IItem
+type IItem interface {
+	CreateItem(ctx context.Context, item *model.Item) error
+	GetItems(ctx context.Context) ([]model.Item, error)
+	UpdateItem(ctx context.Context, item *model.Item) error
+	DeleteItem(ctx context.Context, id int) (*model.Item, error)
 }
 
-func NewItem(service service.IItem) *Item {
+type Item struct {
+	service IItem
+}
+
+func NewItem(service IItem) *Item {
 	return &Item{
 		service: service,
 	}
@@ -52,7 +59,11 @@ func (h *Item) UpdateItem(c *gin.Context) {
 		})
 	}
 
-	if err := h.service.UpdateItem(c, id); err != nil {
+	var item model.Item
+	c.ShouldBind(&item)
+	item.Id = int64(id)
+
+	if err := h.service.UpdateItem(c, &item); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})

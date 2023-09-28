@@ -20,12 +20,10 @@ func (s *storage) GetItems() ([]model.Item, error) {
 	return items, nil
 }
 
-func (s *storage) UpdateItem(id int) error {
-	var item *model.Item
-	if err := s.db.Where("id = ?", id).First(&item).Error; err != nil {
+func (s *storage) UpdateItem(item *model.Item) error {
+	if err := s.db.Save(item).Error; err != nil {
 		return err
 	}
-	s.db.Save(item)
 	return nil
 }
 

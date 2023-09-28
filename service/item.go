@@ -3,24 +3,23 @@ package service
 import (
 	"context"
 	"go-gin/model"
-	"go-gin/storage"
 )
 
-type Item struct {
-	storage storage.IStorage
+type IItem interface {
+	CreateItem(item *model.Item) error
+	GetItems() ([]model.Item, error)
+	UpdateItem(item *model.Item) error
+	DeleteItem(id int) (*model.Item, error)
 }
 
-func NewItem(storage storage.IStorage) *Item {
+type Item struct {
+	storage IItem
+}
+
+func NewItem(storage IItem) *Item {
 	return &Item{
 		storage: storage,
 	}
-}
-
-type IItem interface {
-	CreateItem(ctx context.Context, item *model.Item) error
-	GetItems(ctx context.Context) ([]model.Item, error)
-	UpdateItem(ctx context.Context, id int) error
-	DeleteItem(ctx context.Context, id int) (*model.Item, error)
 }
 
 func (i *Item) CreateItem(cxt context.Context, item *model.Item) error {
@@ -39,8 +38,8 @@ func (i *Item) GetItems(ctx context.Context) ([]model.Item, error) {
 	return items, nil
 }
 
-func (i *Item) UpdateItem(ctx context.Context, id int) error {
-	if err := i.storage.UpdateItem(id); err != nil {
+func (i *Item) UpdateItem(ctx context.Context, item *model.Item) error {
+	if err := i.storage.UpdateItem(item); err != nil {
 		return err
 	}
 	return nil
